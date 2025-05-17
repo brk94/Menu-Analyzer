@@ -904,54 +904,48 @@ class App:
         return resposta.get()
 
     def inicio_adicionar_carrinho(self, prato, qtd, nome_pagina, popup):
-         # Dados base
-        id_item = prato[nome_pagina]
-        tipo_item = nome_pagina.split("_")[1]  # Ex: "entradas"
-        nome_item = prato['nome']
-        preco_unitario = float(prato['preco'])
+            # Dados base
+            id_item = prato[nome_pagina]
+            tipo_item = nome_pagina.split("_")[1]  # Ex: "entradas"
+            nome_item = prato['nome']
+            preco_unitario = float(prato['preco'])
 
-        ingredientes_adicionados = []
-        ingredientes_removidos = []
+            ingredientes_adicionados = []
+            ingredientes_removidos = []
 
-        if self.flag_alergia:
-            flag_validacao = self.inicio_popup_confirmacao_alergenico(prato)
-            if flag_validacao: # O usuário clicou em Confirmar
-                # Ingredientes adicionados (quando var == 1)
-                for nome, var in self.ingredientes_selecionados_adicionar.items():
-                    if var.get() == 1:
-                        ingredientes_adicionados.append(nome)
+            if self.flag_alergia:
+                flag_validacao = self.inicio_popup_confirmacao_alergenico(prato)
+                if not flag_validacao:
+                    return  # O usuário cancelou o popup
 
-                # Ingredientes removidos (quando var == 0)
-                for nome, var in self.ingredientes_selecionados_remover.items():
-                    if var.get() == 0:
-                        ingredientes_removidos.append(nome)
+            # Esta parte deve ser feita sempre, independentemente da alergia
+            for nome, var in self.ingredientes_selecionados_adicionar.items():
+                if var.get() == 1:
+                    ingredientes_adicionados.append(nome)
+            for nome, var in self.ingredientes_selecionados_remover.items():
+                if var.get() == 0:
+                    ingredientes_removidos.append(nome)
 
-                # Você pode transformar em string para salvar no banco:
-                adicionados_str = ', '.join(ingredientes_adicionados)
-                removidos_str = ', '.join(ingredientes_removidos)
+            # Inserção no carrinho (com ou sem alergia)
+            adicionados_str = ', '.join(ingredientes_adicionados)
+            removidos_str = ', '.join(ingredientes_removidos)
 
-                try:
-                    with sqlite3.connect('projeto1.db') as conexao:
-                        cursor = conexao.cursor()
-                        # Executa o Insert
-                        cursor.execute("""
+            try:
+                with sqlite3.connect('projeto1.db') as conexao:
+                    cursor = conexao.cursor()
+                    cursor.execute("""
                         INSERT INTO carrinho (id_item, tipo_item, nome_item, preco_unitario, quantidade,
                             ingredientes_removidos, ingredientes_adicionados) VALUES (?, ?, ?, ?, ?, ?, ?)
-                        """, (id_item, tipo_item, nome_item, preco_unitario, qtd, removidos_str, adicionados_str))
-                        conexao.commit()
-                        messagebox.showinfo("Sucesso", "Item adicionado ao carrinho!")
-
-                        # Limpa os ingredientes após inserção bem-sucedida
-                        self.ingredientes_selecionados_adicionar.clear()
-                        self.ingredientes_selecionados_remover.clear()
-
-                        # Fecha o popup
-                        popup.unbind_all("<MouseWheel>")
-                        popup.destroy()  # <- você precisa passar o popup como argumento para esta função
-
-                except sqlite3.Error as err:
-                    print("Erro ao inserir no carrinho:", err)
-                    messagebox.showerror("Erro", f"Não foi possível adicionar ao carrinho.\n{err}")
+                    """, (id_item, tipo_item, nome_item, preco_unitario, qtd, removidos_str, adicionados_str))
+                    conexao.commit()
+                    messagebox.showinfo("Sucesso", "Item adicionado ao carrinho!")
+                    self.ingredientes_selecionados_adicionar.clear()
+                    self.ingredientes_selecionados_remover.clear()
+                    popup.unbind_all("<MouseWheel>")
+                    popup.destroy()
+            except sqlite3.Error as err:
+                print("Erro ao inserir no carrinho:", err)
+                messagebox.showerror("Erro", f"Não foi possível adicionar ao carrinho.\n{err}")
 
     def inicio_carregar_dados_iniciais(self):
         try:
@@ -1233,7 +1227,7 @@ class App:
         ingredientes_removiveis_str = prato.get("ingredientes_removiveis", "")
         ingredientes_removiveis = [i.strip() for i in ingredientes_removiveis_str.split(",") if i.strip()]
 
-        # Salvar os ingredients que vão ser adicionados
+        # Salvar os ingredientes que vão ser adicionados
         self.ingredientes_selecionados_adicionar = {}
 
         # Salvar os ingredientes que vão ser removidos

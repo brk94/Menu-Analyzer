@@ -16,7 +16,7 @@ try:
     conexao.row_factory = sqlite3.Row  # permite acessar colunas por nome
     cursor = conexao.cursor()
 except sqlite3.Error as err:
-    print(f"Erro ao conectar ao banco de0 dados: {err}")
+    print(f"Erro ao conectar ao banco de dados: {err}")
 
 # --- Função para centralizar a janela ---
 
@@ -368,6 +368,7 @@ class App:
                   background='#ffffff', activebackground='#ffffff',
                   command=lambda: self.trocar_para_segunda_tela(nome_usuario.get(), placeholder_text))
         botao.place(relx=0.928, rely=0.94, anchor="center", width=46, height=34)
+        botao.config(cursor="hand2")
 
     def criar_frame_segunda_tela_old_user(self):
         frame = tk.Frame(self.root)
@@ -410,6 +411,7 @@ class App:
                   background='#ffffff', activebackground='#ffffff',
                   command=lambda: self.trocar_para_terceira_tela(2, email_usuario))
         botao.place(relx=0.928, rely=0.94, anchor="center", width=46, height=34)
+        botao.config(cursor="hand2")
 
     def criar_frame_segunda_tela(self):
         # Criação do Frame principal diretamente no root
@@ -551,12 +553,15 @@ class App:
 
         # Botões para adicionar/remover Entries
         botao_adicionar = ttk.Button(frame, text="+", width=3, command=adicionar_entry, style="Red.TButton")
+        botao_adicionar.config(cursor="hand2")
         botao_remover = ttk.Button(frame, text="-", width=3, command=remover_entry, style="Red.TButton")
+        botao_adicionar.config(cursor="hand2")
 
         # Botão para continuar
         botao = tk.Button(frame, image=seta, borderwidth=0, highlightthickness=0,
                           command=lambda: self.trocar_para_terceira_tela(1, entry_email.get()))
         botao.place(relx=0.928, rely=0.95, anchor="center", width=46, height=34)
+        botao.config(cursor="hand2")
 
     def criar_frame_tela_carrinho(self):
         frame = tk.Frame(self.root)
@@ -749,17 +754,20 @@ class App:
                                 background="#ffffff", activebackground='#ffffff', borderwidth=0, highlightthickness=0)
             botao_mais.image = plus3
             botao_mais.place(x=80, y=5)  # acima à direita da label
+            botao_mais.config(cursor="hand2")
 
             botao_menos = tk.Button(frame_direita, image=minus3, command=lambda item=item, var=qtd_var: subtrair(item, var),
                                     background="#ffffff", activebackground='#ffffff', borderwidth=0, highlightthickness=0)
             botao_menos.image = minus3
             botao_menos.place(x=80, y=35)  # abaixo à direita da label
+            botao_menos.config(cursor="hand2")
 
             # Botão de lixeira (à esquerda da label)
             botao_lixeira = tk.Button(frame_direita, image=lixeira, command=lambda item=item, var=qtd_var, c=card: remover_item_do_carrinho(item, var, c),
                                     background="#ffffff", activebackground='#ffffff', borderwidth=0, highlightthickness=0)
             botao_lixeira.image = lixeira
             botao_lixeira.place(x=10, y=19)
+            botao_lixeira.config(cursor="hand2")
 
     def criar_frame_tela_inicio(self):
         frame = tk.Frame(self.root)
@@ -859,7 +867,7 @@ class App:
         elif alergenicos is None:
             alergenicos = []
 
-        alergenicos_formatados = [a.capitalize() for a in alergenicos]
+        alergenicos_formatados = [a.title() for a in alergenicos]
 
         style = Style()
         style.configure("Red.TLabel", foreground="#F47070")
@@ -894,8 +902,12 @@ class App:
         style.map("Custom.TButton",
                 background=[("active", "#F47070"), ("!disabled", "#F47070")])
 
-        ttk.Button(botoes_frame, text="Confirmar", style="Custom.TButton", command=confirmar, width=12).pack(side="left", padx=10)
-        ttk.Button(botoes_frame, text="Cancelar", style="Custom.TButton", command=cancelar, width=12).pack(side="right", padx=10)
+        botao_confirmar = ttk.Button(botoes_frame, text="Confirmar", style="Custom.TButton", command=confirmar, width=12)
+        botao_confirmar.pack(side="left", padx=10)
+        botao_confirmar.config(cursor="hand2")
+        botao_cancelar.pack(side="left", padx=10)
+        botao_cancelar = ttk.Button(botoes_frame, text="Cancelar", style="Custom.TButton", command=cancelar, width=12).pack(side="right", padx=10)
+        botao_cancelar.config(cursor="hand2")
 
         # Espera o popup ser fechado
         self.root.wait_window(popup)
@@ -1025,9 +1037,11 @@ class App:
 
         btn_descricao = tk.Button(popup, image=descricao, background="#ffffff", activebackground='#ffffff', fg="white", borderwidth=0, highlightthickness=0, command=lambda: trocar_texto(prato['descricao']))
         btn_descricao.place(x=25, y=70)
-
+        btn_descricao.config(cursor="hand2")
+        
         btn_detalhes = tk.Button(popup, image=historia, background="#ffffff", activebackground='#ffffff', fg="white", borderwidth=0, highlightthickness=0, command=lambda: trocar_texto(prato['detalhes']))
         btn_detalhes.place(x=205, y=70)
+        btn_detalhes.config(cursor="hand2")
 
         # Texto scrollável
         texto_box = scrolledtext.ScrolledText(popup, wrap=tk.WORD, width=45, height=5, font=("Arial", 10))
@@ -1214,6 +1228,7 @@ class App:
         botao_adicionar = tk.Button(popup, image=adicionar, background="#ffffff", activebackground='#ffffff', fg="white", 
                             borderwidth=0, highlightthickness=0, command=lambda: self.inicio_adicionar_carrinho(prato, qtd_var.get(), nome_pagina, popup))
         botao_adicionar.place(x=372, y=635)
+        botao_adicionar.config(cursor="hand2")
 
         # Parte de criação dos cards
         titulo = ttk.Label(scroll_frame, text="Deseja adicionar algum ingrediente?", font=("Arial", 12, "bold"), style='Red.TLabel')
@@ -1262,12 +1277,14 @@ class App:
    
             botao_menos = tk.Button(card, image=minus2, command=menos, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff')
             botao_menos.place(x=400, y=20)
+            botao_menos.config(cursor="hand2")
 
             label_qtd = ttk.Label(card, textvariable=qtd_ingrediente_var, style="Red.TLabel", font=("Arial", 10))
             label_qtd.place(x=443.5, y=22)
 
             botao_mais = tk.Button(card, image=plus2, command=mais, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff')
             botao_mais.place(x=470, y=20)
+            botao_mais.config(cursor="hand2")
 
         # Label para ingredientes removíveis
         titulo_remover = ttk.Label(scroll_frame, text="Deseja remover algum ingrediente?", font=("Arial", 12, "bold"), style='Red.TLabel')
@@ -1301,12 +1318,14 @@ class App:
 
             botao_menos = tk.Button(card, image=minus2, command=menos, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff')
             botao_menos.place(x=400, y=20)
+            botao_menos.config(cursor="hand2")
 
             label_qtd = ttk.Label(card, textvariable=qtd_remover_var, style="Red.TLabel", font=("Arial", 10))
             label_qtd.place(x=443.5, y=22)
 
             botao_mais = tk.Button(card, image=plus2, command=mais, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff')
             botao_mais.place(x=470, y=20)
+            botao_mais.config(cursor="hand2")
 
         # Aguarda o fechamento da janela para liberar a janela principal
         self.root.wait_window(popup)
@@ -1322,6 +1341,7 @@ class App:
                     btn = tk.Button(frame, image=imagem, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff',
                                     command=lambda n=nome_botao: self.inicio_alterar_botoes(n))
                     btn.image = imagem
+                    btn.config(cursor="hand2")
                     self.botoes_paginas[nome_botao] = btn
 
                     if nome_botao in ['Inicio', 'Perfil', 'Carrinho']:
@@ -1405,6 +1425,7 @@ class App:
                                         command=lambda p=prato: self.inicio_abrir_detalhes_prato(p, nome_pagina))
                         btn.image = imagem_tk
                         btn.pack()
+                        btn.config(cursor="hand2")
 
                         info = ttk.Label(card, text=f"{nome}\nR$ {preco:.2f}", font=("Figtree", 13, "bold"), background="#FFFFFF", foreground="#F47070", justify="center")
 
@@ -1463,24 +1484,9 @@ class App:
                             quantidade = item['quantidade']
 
                             # Insere na tabela itens_pedido com os novos campos
-                            cursor.execute("""
-                                INSERT INTO itens_pedido (
-                                    id_pedido,
-                                    nome_prato,
-                                    categoria,
-                                    ingredientes_adicionados,
-                                    ingredientes_removidos,
-                                    quantidade
-                                )
-                                VALUES (?, ?, ?, ?, ?, ?)
-                            """, (
-                                id_pedido,
-                                nome_prato,
-                                categoria_prato,
-                                ingredientes_adicionados,
-                                ingredientes_removidos,
-                                quantidade
-                            ))
+                            cursor.execute("""INSERT INTO itens_pedido (id_pedido, nome_prato, categoria, ingredientes_adicionados,
+                                ingredientes_removidos, quantidade) VALUES (?, ?, ?, ?, ?, ?)""", 
+                                (id_pedido, nome_prato, categoria_prato, ingredientes_adicionados, ingredientes_removidos, quantidade))
 
                         cursor.execute("DELETE FROM carrinho")
                         conexao.commit()
@@ -1520,6 +1526,7 @@ class App:
                 btn = tk.Button(frame, image=imagem, borderwidth=0, highlightthickness=0, background='#ffffff',
                                 activebackground='#ffffff', command=lambda n=nome_botao: self.carrinho_alterar_botoes(n))
                 btn.image = imagem
+                btn.config(cursor="hand2")
                 self.botoes_paginas[nome_botao] = btn
 
                 btn.place(relx=botao_info["relx"], rely=botao_info["rely"], anchor="center", width=300, height=61)
@@ -1531,10 +1538,12 @@ class App:
         botao_adicionar_items = tk.Button(frame, image=adicionar_items, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff',
                                   highlightbackground="#ffffff", highlightcolor="#ffffff", takefocus=False, command=lambda: self.mostrar_frame('tela_inicio'))
         botao_adicionar_items.place(relx=0.38, rely=0.73)
+        botao_adicionar_items.config(cursor="hand2")
 
         botao_finalizar_comprar = tk.Button(frame, image=finalizar_compra, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff',
                                     command=lambda n=nome_botao: self.carrinho_finalizar_compra(n))
         botao_finalizar_comprar.place(relx=0.5, rely=0.83)
+        botao_finalizar_comprar.config(cursor="hand2")
 
     def carrinho_alterar_botoes(self, nome_botao_pagina):
         if nome_botao_pagina == 'Inicio':
@@ -1558,6 +1567,8 @@ class App:
                     btn = tk.Button(frame, image=imagem, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff',
                                     command=lambda n=nome_botao: self.perfil_alterar_botoes(n))
                     btn.image = imagem
+                    btn.config(cursor="hand2")
+
                     self.botoes_paginas[nome_botao] = btn
 
                     if nome_botao in ['Inicio', 'Carrinho', 'Perfil']:
@@ -1860,9 +1871,7 @@ class App:
                 conexao.row_factory = sqlite3.Row  # Permite acessar colunas pelo nome
                 cursor = conexao.cursor()
                 # Consulta os valores atuais no banco de dados
-                query_atual = """
-                SELECT a.nome
-                FROM alergenicos a
+                query_atual = """SELECT a.nome FROM alergenicos a
                 JOIN usuarios_alergenicos ua ON a.id_alergenico = ua.id_alergenico
                 JOIN usuarios u ON u.id_usuario = ua.id_usuario
                 WHERE u.nome = ?
@@ -2135,11 +2144,8 @@ class App:
                     id_usuario = resultado['id_usuario']
 
                     # Agora usamos o id_usuario para buscar os pedidos
-                    cursor.execute("""
-                        SELECT P.id_pedido, P.preco_total,
-                            COUNT(I.id_item) AS quantidade_total
-                        FROM pedidos P
-                        JOIN itens_pedido I ON P.id_pedido = I.id_pedido
+                    cursor.execute("""SELECT P.id_pedido, P.preco_total, COUNT(I.id_item) AS quantidade_total
+                        FROM pedidos P JOIN itens_pedido I ON P.id_pedido = I.id_pedido
                         WHERE P.id_usuario = ?
                         GROUP BY P.id_pedido, P.preco_total
                         ORDER BY P.id_pedido
@@ -2176,7 +2182,10 @@ class App:
                 ttk.Label(info_frame, text=f"Quantidade: {quantidade}", style="Info.TLabel").pack(anchor='w')
                 ttk.Label(info_frame, text=f"Total: R$ {total:.2f}", style="Total.TLabel").pack(anchor='w')
 
-                ttk.Button(card, text="Ver Detalhes", width=15, style="Custom.TButton", command=lambda p=id_pedido: self.perfil_abrir_detalhes_pedido(p)).pack(side='right', padx=10, pady=10)
+                ver_detalhes = ttk.Button(card, text="Ver Detalhes", width=15, style="Custom.TButton", command=lambda p=id_pedido: self.perfil_abrir_detalhes_pedido(p))
+                ver_detalhes.pack(side='right', padx=10, pady=10)
+                ver_detalhes.config(cursor="hand2")
+
         else:
             ttk.Label(frame_interno, text="Nenhum pedido encontrado.", foreground='#F47070', font=("Segoe UI", 12)).pack(pady=20)
 
@@ -2198,7 +2207,8 @@ class App:
                     background='#ffffff', activebackground='#ffffff',
                     command=lambda: self.perfil_salvar_feedback(nome_usuario_feedback.get(), email_usuario_feedback.get(), mensagem_usuario_feedback.get("1.0", "end-1c"), popup))
             botao_enviar.place(relx=0.49, rely=0.69, anchor="center", width=119, height=35)
-            
+            botao_enviar.config(cursor="hand2")
+
             # Método para colocar placeholder em campos de texto caso necessário
             def criar_entry_com_placeholder(frame, placeholder_text, largura=40, justificar='center'):
                 entry = ttk.Entry(frame, font=("Montserrat", 14), width=largura, justify=justificar)
@@ -2358,57 +2368,60 @@ class App:
             command=lambda: self.perfil_atualizar_alergias(popup)
         )
         botao_alterar.place(relx=0.5, rely=0.96, anchor="center", width=148, height=50)
+        botao_alterar.config(cursor="hand2")
+        
 
         # Botão -
         botao_remover = tk.Button(
             container_frame, image=minus, borderwidth=0, highlightthickness=0, background='#ffffff', activebackground='#ffffff', command=remover_card)
         botao_remover.place(relx=0.3, rely=0.96, anchor="center")
+        botao_remover.config(cursor="hand2")
 
         # Botão +
         botao_adicionar = tk.Button(container_frame, image=plus, borderwidth=0, highlightthickness=0,
             background='#ffffff', activebackground='#ffffff', command=lambda: adicionar_card())
         botao_adicionar.place(relx=0.7, rely=0.96, anchor="center")
+        botao_adicionar.config(cursor="hand2")
 
         # Botão para salvar alterações
         botao_alterar = tk.Button(container_frame, image=alterar, borderwidth=0, highlightthickness=0,
             background='#ffffff', activebackground='#ffffff', command=lambda: self.perfil_atualizar_alergias(popup)
         )
         botao_alterar.place(relx=0.5, rely=0.96, anchor="center", width=148, height=50)
+        botao_alterar.config(cursor="hand2")
 
         # Lista para armazenar os widgets Entry
         self.alergia_entries = []
 
-        def criar_entry_com_placeholder(frame, placeholder_text):
-            entry = ttk.Entry(frame, font=("Montserrat", 12))
+       # Carregar as alergias atuais do usuário
+        try:
+            with sqlite3.connect('projeto1.db') as conexao:
+                conexao.row_factory = sqlite3.Row
+                cursor = conexao.cursor()
 
-            # Verifica se é para tratar como placeholder
-            if placeholder_text in ("", "Alergênico não definido"):
-                entry.insert(0, "Alergênico não definido")
-                entry.config(foreground='grey')
-                entry.placeholder_ativo = True
-            else:
-                entry.insert(0, placeholder_text)
-                entry.config(foreground='black')
-                entry.placeholder_ativo = False
+                cursor.execute("SELECT id_usuario FROM usuarios WHERE nome = ?", (self.nome_usuario,))
+                resultado_usuario = cursor.fetchone()
 
-            def on_focus_in(event):
-                if entry.placeholder_ativo:
-                    entry.delete(0, tk.END)
-                    entry.config(foreground='black')
-                    entry.placeholder_ativo = False
+                if not resultado_usuario:
+                    raise Exception("Usuário não encontrado.")
 
-            def on_key_release(event):
-                if entry.get() == "" and entry.placeholder_ativo:
-                    entry.config(foreground='black')
-                    entry.placeholder_ativo = False
+                id_usuario = resultado_usuario["id_usuario"]
 
-            entry.bind("<FocusIn>", on_focus_in)
-            entry.bind("<KeyRelease>", on_key_release)
+                cursor.execute("""SELECT a.nome FROM alergenicos a
+                    JOIN usuarios_alergenicos ua ON a.id_alergenico = ua.id_alergenico
+                    WHERE ua.id_usuario = ?
+                    ORDER BY a.nome ASC
+                """, (id_usuario,))
+                resultados = cursor.fetchall()
 
-            return entry
+                alergias_atuais = [row["nome"] for row in resultados] if resultados else []
 
-        # Cria os campos de edição dentro do scrollable_frame
-        for alergia in self.labels_alergenicos:
+        except sqlite3.Error as err:
+            print(f"Erro ao carregar alergias do usuário: {err}")
+            alergias_atuais = []
+
+        # Criação dos cards baseados nas alergias atuais do usuário
+        for alergia in alergias_atuais:
             adicionar_card(alergia)
 
         # Desvincula o evento de rolagem ao fechar o popup

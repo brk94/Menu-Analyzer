@@ -10,13 +10,34 @@ from tkinter import Toplevel, Label
 from tkinter import scrolledtext
 from tkinter import messagebox
 
-# Conexão com o banco de dados
+# Caminhos
+caminho_db = 'projeto1.db'
+schema_path = 'schema.sql'
+
+# Verifica se o banco já existe
+novo_banco = not os.path.exists(caminho_db)
+
+# Conexão
 try:
-    conexao = sqlite3.connect('projeto1.db')
-    conexao.row_factory = sqlite3.Row  # permite acessar colunas por nome
+    conexao = sqlite3.connect(caminho_db)
+    conexao.row_factory = sqlite3.Row
     cursor = conexao.cursor()
+
+    # Verifica se já existem tabelas
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tabelas = cursor.fetchall()
+
+    if novo_banco or len(tabelas) == 0:
+        print("Criando estrutura do banco de dados a partir de schema.sql...")
+        with open(schema_path, 'r', encoding='utf-8') as f:
+            schema_sql = f.read()
+            cursor.executescript(schema_sql)
+            conexao.commit()
+
 except sqlite3.Error as err:
-    print(f"Erro ao conectar ao banco de dados: {err}")
+    print(f"Erro ao conectar ou inicializar o banco de dados: {err}")
+    conexao = None
+    cursor = None
 
 # Função para centralizar a janela
 

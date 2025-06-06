@@ -140,48 +140,40 @@ class App:
                 self.mostrar_frame("segunda")
 
     def trocar_para_terceira_tela(self, flag, email_usuario=""):
-        # Salva o email do usuário no código
-        self.email_usuario = email_usuario
-
         if flag == 1:
+            self.email_usuario = email_usuario
+
             try:
                 with sqlite3.connect('projeto1.db') as conexao:
                     cursor = conexao.cursor()
-                    # Insere ou atualiza o usuário na tabela
-                    sql = "INSERT INTO usuarios (nome, email)VALUES (?, ?)"
+                    sql = "INSERT INTO usuarios (nome, email) VALUES (?, ?)"
                     valores = (self.nome_usuario, self.email_usuario)
                     cursor.execute(sql, valores)
-                    id_usuario = cursor.lastrowid  # Recuperar id do usuário recém inserido
+                    id_usuario = cursor.lastrowid
 
                     for entry in self.alergenicos_entries:
                         nome_alergia = entry.get().strip().capitalize()
-                        
                         if not nome_alergia or nome_alergia == 'Digite aqui seu alergênico...':
-                            continue  # Pula se vazio ou placeholder
+                            continue
 
-                        try:
-                            cursor.execute("SELECT id_alergenico FROM alergenicos WHERE nome = ?", (nome_alergia,))
-                            resultado = cursor.fetchone()
-                            if resultado:
-                                id_alergenico = resultado[0]
-                                try:
-                                    cursor.execute("INSERT INTO usuarios_alergenicos (id_usuario, id_alergenico) VALUES (?, ?)", (id_usuario, id_alergenico))
-                                except sqlite3.IntegrityError:
-                                    print(f"Alergia '{nome_alergia}' já associada ao usuário.")
-                            else:
-                                print(f"Alergia não encontrada: {nome_alergia}")
-
-                        except sqlite3.Error as err_alergia:
-                            print(f"Erro ao associar alergia '{nome_alergia}': {err_alergia}")
+                        cursor.execute("SELECT id_alergenico FROM alergenicos WHERE nome = ?", (nome_alergia,))
+                        resultado = cursor.fetchone()
+                        if resultado:
+                            id_alergenico = resultado[0]
+                            try:
+                                cursor.execute("INSERT INTO usuarios_alergenicos (id_usuario, id_alergenico) VALUES (?, ?)", (id_usuario, id_alergenico))
+                            except sqlite3.IntegrityError:
+                                print(f"Alergia '{nome_alergia}' já associada ao usuário.")
+                        else:
+                            print(f"Alergia não encontrada: {nome_alergia}")
 
                     conexao.commit()
                     print("Usuário e alergênicos inseridos/atualizados com sucesso!")
             except sqlite3.Error as err:
                 print(f"Erro ao inserir/atualizar usuário e alérgenos no banco de dados: {err}")
 
-        # Chamar a função para criar a tela de perfil, já que agora temos o nome do usuário!
-        self.criar_frame_tela_perfil()
-        self.mostrar_frame("tela_inicio")
+            self.criar_frame_tela_perfil()
+            self.mostrar_frame("tela_inicio")
 
     def trocar_para_tela_perfil(self):
         self.mostrar_frame("tela_perfil")
@@ -544,9 +536,17 @@ class App:
         botao_remover = ttk.Button(frame, text="-", width=3, command=remover_entry, style="Red.TButton")
         botao_adicionar.config(cursor="hand2")
 
-        # Botão para continuar
-        botao = tk.Button(frame, image=seta, borderwidth=0, highlightthickness=0,
-                          command=lambda: self.trocar_para_terceira_tela(1, entry_email.get()))
+        def ao_clicar_botao_continuar():
+            email_digitado = entry_email.get().strip()
+            
+            # Verifica se está vazio ou se ainda é o placeholder
+            if not email_digitado or email_digitado == "Informe aqui seu e-mail..":
+                self.perfil_exibir_mensagem(self.root, "Por favor, preencha o e-mail antes de continuar.", "Campo obrigatório")
+                return
+
+            self.trocar_para_terceira_tela(1, email_digitado)
+
+        botao = tk.Button(frame, image=seta, borderwidth=0, highlightthickness=0, command=ao_clicar_botao_continuar)
         botao.place(relx=0.928, rely=0.95, anchor="center", width=46, height=34)
         botao.config(cursor="hand2")
 

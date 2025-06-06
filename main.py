@@ -18,7 +18,7 @@ try:
 except sqlite3.Error as err:
     print(f"Erro ao conectar ao banco de dados: {err}")
 
-# --- Função para centralizar a janela ---
+# Função para centralizar a janela
 
 def centralizar_janela(janela):
     janela.update_idletasks()
@@ -30,7 +30,7 @@ def centralizar_janela(janela):
     y = (altura_tela // 2) - (altura_janela // 2)
     janela.geometry(f"{largura_janela}x{altura_janela}+{x}+{y}")
 
-#  --- Classe para controle de telas ---
+# Classe para controle de telas
 
 class App:
     def __init__(self, root):
@@ -49,10 +49,8 @@ class App:
 
         # Exibe a tela inicial
         self.mostrar_frame("inicial")
-        #self.mostrar_frame("tela_inicio")
-        #self.mostrar_frame("tela_perfil")
 
-    # --- Métodos de Limpeza do Banco de Dados ---
+    # Métodos de Limpeza do Banco de Dados
 
     def limpar_carrinho_antes_de_sair(self):
         try:
@@ -72,7 +70,7 @@ class App:
         self.limpar_carrinho_antes_de_sair()
         self.root.destroy()
 
-    # --- Métodos de Navegação entre Telas ---
+    # Métodos de Navegação entre Telas
 
     def mostrar_frame(self, nome):
         if nome == 'tela_carrinho':
@@ -123,28 +121,13 @@ class App:
     def trocar_para_terceira_tela(self, flag, email_usuario=""):
         # Salva o email do usuário no código
         self.email_usuario = email_usuario
-        print(self.email_usuario)
 
         if flag == 1:
-            placeholder = 'Digite aqui seu alergênico...'
-
-            # Coletar os valores preenchidos dinamicamente nas entries
-            alergenicos = [
-                entry.get().strip().capitalize() for entry in self.alergenicos_entries
-                if entry.get().strip() and entry.get().strip() != placeholder
-            ]
-
-            if self.check_box1_tela_dois.get() == 1 and alergenicos:
-                print("Alergênicos a serem inseridos:", alergenicos)
-
             try:
                 with sqlite3.connect('projeto1.db') as conexao:
                     cursor = conexao.cursor()
                     # Insere ou atualiza o usuário na tabela
-                    sql = """
-                    INSERT INTO usuarios (nome, email)
-                    VALUES (?, ?)
-                    """
+                    sql = "INSERT INTO usuarios (nome, email)VALUES (?, ?)"
                     valores = (self.nome_usuario, self.email_usuario)
                     cursor.execute(sql, valores)
                     id_usuario = cursor.lastrowid  # Recuperar id do usuário recém inserido
@@ -153,7 +136,7 @@ class App:
                         nome_alergia = entry.get().strip().capitalize()
                         
                         if not nome_alergia or nome_alergia == 'Digite aqui seu alergênico...':
-                            continue  # pula se vazio ou placeholder
+                            continue  # Pula se vazio ou placeholder
 
                         try:
                             cursor.execute("SELECT id_alergenico FROM alergenicos WHERE nome = ?", (nome_alergia,))
@@ -161,10 +144,7 @@ class App:
                             if resultado:
                                 id_alergenico = resultado[0]
                                 try:
-                                    cursor.execute(
-                                        "INSERT INTO usuarios_alergenicos (id_usuario, id_alergenico) VALUES (?, ?)",
-                                        (id_usuario, id_alergenico)
-                                    )
+                                    cursor.execute("INSERT INTO usuarios_alergenicos (id_usuario, id_alergenico) VALUES (?, ?)", (id_usuario, id_alergenico))
                                 except sqlite3.IntegrityError:
                                     print(f"Alergia '{nome_alergia}' já associada ao usuário.")
                             else:
@@ -188,7 +168,7 @@ class App:
     def trocar_para_tela_carrinho(self):
         self.mostrar_frame('tela_carrinho')
 
-    # --- Métodos de Criação das Telas ---
+    # Métodos de Criação das Telas
 
     def criar_frame_tela_perfil(self):
         frame = ttk.Frame(self.root)
@@ -265,31 +245,20 @@ class App:
 
         canvas.bind("<Configure>", resize_scrollable_frame)
 
-        # Desvincula o evento de rolagem ao fechar o frame
-        def on_close():
-            canvas.unbind("<MouseWheel>")  # Remove o evento do Windows
-            canvas.unbind("<Button-4>")  # Remove o evento de scroll up
-            canvas.unbind("<Button-5>")  # Remove o evento de scroll down
-            frame.destroy()
-
         # Leitura de dados para o usuário conectado (nome e alergias)
-        # Precisa remover a linha abaixo na versão final do código.
-        #self.nome_usuario = 'asd11212z'
         try:
             with sqlite3.connect('projeto1.db') as conexao:
                 conexao.row_factory = sqlite3.Row
                 cursor = conexao.cursor()
 
-                # 1. Obter o id do usuário
+                # Obter o id do usuário
                 cursor.execute("SELECT id_usuario FROM usuarios WHERE nome = ?", (self.nome_usuario,))
                 usuario = cursor.fetchone()
                 if usuario:
                     id_usuario = usuario["id_usuario"]
 
-                    # 2 e 3. Obter os nomes dos alérgenos associados ao usuário
-                    query = """
-                        SELECT a.nome
-                        FROM alergenicos a
+                    # Obter os nomes dos alérgenos associados ao usuário
+                    query = """SELECT a.nome FROM alergenicos a
                         JOIN usuarios_alergenicos ua ON a.id_alergenico = ua.id_alergenico
                         WHERE ua.id_usuario = ?
                     """
@@ -399,9 +368,6 @@ class App:
 
                 if resultado:
                     email_usuario = resultado["email"]
-                    print(f"Email do usuário {self.nome_usuario}: {email_usuario}")
-                else:
-                    print(f"Usuário '{self.nome_usuario}' não encontrado.")
 
         except sqlite3.Error as err:
             print(f"Erro ao acessar o banco de dados: {err}")
@@ -569,7 +535,7 @@ class App:
         self.frames["tela_carrinho"] = frame
 
         # Fundo com imagem
-        caminho_base = os.path.join(self.caminho_base_padrao + "\Tela Carrinho.png")
+        caminho_base = os.path.join(self.caminho_base_padrao + "\\Tela Carrinho.png")
         imagem = Image.open(caminho_base)
         imagem_tk = ImageTk.PhotoImage(imagem)
         self.label_imagem = tk.Label(frame, image=imagem_tk)
@@ -615,9 +581,6 @@ class App:
 
             canvas.master.bind_all("<MouseWheel>", mousewheel_global)
 
-            def remover_scroll():
-                canvas.master.unbind_all("<MouseWheel>")
-
         ativar_scroll_carrinho()
 
         try:
@@ -631,7 +594,6 @@ class App:
 
         except sqlite3.Error as err:
             print(f"Erro ao acessar o banco de dados: {err}")
-
 
         self.itens_carrinho = []  # Zera a lista de controle
 
@@ -714,6 +676,7 @@ class App:
 
                 atualizar_total_carrinho()
 
+        # Criação dos cards dos produtos no carrinho
         for item in resultados:
             nome = item['nome_item']
             preco = item['preco_unitario']
@@ -775,7 +738,7 @@ class App:
         self.frames["tela_inicio"] = frame
 
         # Fundo com imagem
-        caminho_base = os.path.join(self.caminho_base_padrao + "\Tela Inicio.png")
+        caminho_base = os.path.join(self.caminho_base_padrao + "\\Tela Inicio.png")
         imagem = Image.open(caminho_base)
         imagem_tk = ImageTk.PhotoImage(imagem)
         self.label_imagem = tk.Label(frame, image=imagem_tk)
@@ -831,16 +794,13 @@ class App:
             {"nome": "Perfil", "imagem": "PerfilOFF.png", "relx": 0.833, "rely": 0.964},
         ]
 
-        # Lista para armazinar os labels das páginas
-        self.labels_pratos = {}
-
         self.inicio_carregar_dados_iniciais()
         self.inicio_criar_botoes(frame)
 
         # Já carrega as opções de Entradas para evitar problema no código
         self.inicio_alterar_botoes('Entradas')
 
-    # --- Métodos utilizados na Tela de Início ---
+    # Métodos utilizados na Tela de Início
 
     def inicio_popup_confirmacao_alergenico(self, prato):
         largura_popup = 400
@@ -893,20 +853,14 @@ class App:
         botoes_frame.pack(pady=10)
 
         style = ttk.Style()
-        style.configure("Custom.TButton",
-                        background="red",
-                        foreground="white",
-                        borderwidth=0,
-                        focusthickness=0,
-                        padding=6)
-        style.map("Custom.TButton",
-                background=[("active", "#F47070"), ("!disabled", "#F47070")])
+        style.configure("Custom.TButton", background="red", foreground="white", borderwidth=0, focusthickness=0, padding=6)
+        style.map("Custom.TButton", background=[("active", "#F47070"), ("!disabled", "#F47070")])
 
         botao_confirmar = ttk.Button(botoes_frame, text="Confirmar", style="Custom.TButton", command=confirmar, width=12)
         botao_confirmar.pack(side="left", padx=10)
         botao_confirmar.config(cursor="hand2")
+        botao_cancelar = ttk.Button(botoes_frame, text="Cancelar", style="Custom.TButton", command=cancelar, width=12)
         botao_cancelar.pack(side="left", padx=10)
-        botao_cancelar = ttk.Button(botoes_frame, text="Cancelar", style="Custom.TButton", command=cancelar, width=12).pack(side="right", padx=10)
         botao_cancelar.config(cursor="hand2")
 
         # Espera o popup ser fechado
@@ -968,7 +922,7 @@ class App:
                 query = "SELECT * FROM entradas"
                 cursor.execute(query)
                 resultados = cursor.fetchall()
-                extensao_padrao = ".jpg"  # Ou ".jpeg", dependendo do formato das imagens
+                extensao_padrao = ".jpg"  # Formato das imagens
                 # Cria um dicionário para mapear ID do produto para o caminho da imagem
                 mapeamento_imagens = {}
                 for row in resultados:
@@ -977,13 +931,6 @@ class App:
                     nome_arquivo = f"{id_produto}{extensao_padrao}"  # Exemplo: "1.jpg"
                     caminho_completo = os.path.join(self.caminho_base_padrao, nome_arquivo)
                     mapeamento_imagens[id_produto] = caminho_completo
-
-                    # Aproveita o loop para preencher labels com o nome e preço dos produtos
-                    nome_produto = row['nome']
-                    preco_produto = row['preco']
-                    if id_produto in self.labels_pratos:
-                        texto = f"{nome_produto}\nR$ {preco_produto:.2f}"
-                        self.labels_pratos[id_produto].config(text=texto)
 
                 # Atualiza self.botoes_inicio com os caminhos das imagens
                 for item in self.botoes_inicio:
@@ -1001,8 +948,6 @@ class App:
         nome_categoria = nome_pagina.split("_", 1)[1]
         str(nome_categoria).capitalize()
         
-        print("Botão clicado:", prato['nome'], "| ID:", prato[f'{nome_pagina}'])
-
         popup = tk.Toplevel(self.root)
         popup.title("Detalhes do Prato")
 
@@ -1055,13 +1000,10 @@ class App:
 
         alergenicos = prato.get('alergenicos') or ''
 
-        print("teste: ", alergenicos)
-
         if alergenicos == '':
             alerg_info = ttk.Label(popup, text="Não contém nenhum ingrediente alergênico", style="Red.TLabel", font=("Arial", 10, "bold"))
         else:
             alergenicos = ', '.join([alergia.strip().capitalize() for alergia in alergenicos.split(',')])
-            print(alergenicos)
             alerg_info = ttk.Label(popup, text=f"Contém {alergenicos}", style="Red.TLabel", font=("Arial", 10, "bold"))
         alerg_info.place(x=108, y=210)
 
@@ -1374,7 +1316,7 @@ class App:
                 except FileNotFoundError:
                     print(f"Imagem não encontrada: {caminho_completo}")
 
-            # --- Carregamento de dados da categoria selecionada ---
+            # Carregamento de dados da categoria selecionada 
             try:
                 lowercase = nome_botao_pagina.lower()
                 try:
@@ -1393,7 +1335,6 @@ class App:
 
                 self.pratos = []
                 for linha in resultados:
-                    print(linha)
                     prato = {}
                     for coluna, valor in dict(linha).items():
                         if valor is not None:
@@ -1420,7 +1361,6 @@ class App:
                         row = i // 2
                         column = i % 2
                         card.grid(row=row, column=column, padx=80, pady=20, sticky="n")
-                        print(imagem)
                         btn = tk.Button(card, image=imagem_tk, borderwidth=0, highlightthickness=0, bg="#FFFFFF",
                                         command=lambda p=prato: self.inicio_abrir_detalhes_prato(p, nome_pagina))
                         btn.image = imagem_tk
@@ -1443,7 +1383,7 @@ class App:
         elif nome_botao_pagina == 'Perfil':
             self.trocar_para_tela_perfil()
 
-    # --- Métodos utilizados na Tela de Carrinho ---
+    # Métodos utilizados na Tela de Carrinho
 
     def carrinho_finalizar_compra(self, n):
         try:
@@ -1553,7 +1493,7 @@ class App:
         else:
             pass
 
-    # --- Métodos utilizados na Tela de Perfil
+    # Métodos utilizados na Tela de Perfil
 
     def perfil_criar_botoes(self, frame):
         for botao_info in self.botoes_perfil:
@@ -1613,7 +1553,7 @@ class App:
                 with sqlite3.connect('projeto1.db') as conexao:
                     cursor = conexao.cursor()
 
-                    # Passo 1: Obter o id_usuario com base no nome
+                    # Obter o id_usuario com base no nome
                     cursor.execute("SELECT id_usuario FROM usuarios WHERE nome = ?", (self.nome_usuario,))
                     resultado_usuario = cursor.fetchone()
 
@@ -1622,14 +1562,13 @@ class App:
                     else:
                         id_usuario = resultado_usuario[0]
 
-                        # Passo 2: Inserir o feedback com o id_usuario como chave estrangeira
+                        # Inserir o feedback com o id_usuario como chave estrangeira
                         query = "INSERT INTO feedback (nome, email, feedback, id_usuario) VALUES (?, ?, ?, ?)"
                         valores = (nome, email, mensagem, id_usuario)
                         cursor.execute(query, valores)
 
                         conexao.commit()
-                        print("Feedback inserido com sucesso!")
-
+                        
             except sqlite3.Error as err:
                 print(f"Erro ao salvar feedback: {err}")
             popup.after(2000, lambda: (popup.destroy(), pop_up_perfil.destroy()))
@@ -1749,28 +1688,6 @@ class App:
         titulo_label.pack(pady=(20, 10), fill='x')
 
         # Entrada e botão de busca
-        # Placeholder padrão
-        placeholder_text = 'Informe seu e-mail...'
-
-        def criar_entry_com_placeholder(master, placeholder, largura=20, justificar='left'):
-            entry = tk.Entry(master, width=largura, justify=justificar, foreground='gray')
-            entry.insert(0, placeholder)
-
-            def on_focus_in(event):
-                if entry.get() == placeholder:
-                    entry.delete(0, tk.END)
-                    entry.config(foreground='black')
-
-            def on_focus_out(event):
-                if entry.get() == '':
-                    entry.insert(0, placeholder)
-                    entry.config(foreground='gray')
-
-            entry.bind("<FocusIn>", on_focus_in)
-            entry.bind("<FocusOut>", on_focus_out)
-
-            return entry
-
         self.perfil_buscar_feedbacks(frame_interno)
 
         #  Container Inicial dos Cards
@@ -1826,8 +1743,7 @@ class App:
 
                 # Busca os nomes das alergias associadas ao usuário
                 query = """
-                    SELECT a.nome
-                    FROM alergenicos a
+                    SELECT a.nome FROM alergenicos a
                     JOIN usuarios_alergenicos ua ON a.id_alergenico = ua.id_alergenico
                     WHERE ua.id_usuario = ?
                     ORDER BY a.nome ASC
@@ -1922,7 +1838,6 @@ class App:
                         print(f"Alergia '{nome_alergia}' não encontrada na tabela 'alergenicos'.")
 
                 conexao.commit()
-                print("Alergias do usuário atualizadas com sucesso.")
                 # Atualizar os labels dos alérgenos na tela de perfil
                 self.perfil_atualizar_labels_alergenicos()
                 # Exibir mensagem de sucesso
@@ -2327,7 +2242,7 @@ class App:
 
         ativar_scroll_popup_editar_alergias()
 
-        # --- Carrega as opções de alergenicos do banco ---
+        # Carrega as opções de alergenicos do banco
         try:
             with sqlite3.connect('projeto1.db') as conexao:
                 cursor = conexao.cursor()

@@ -172,8 +172,8 @@ class App:
             except sqlite3.Error as err:
                 print(f"Erro ao inserir/atualizar usuário e alérgenos no banco de dados: {err}")
 
-            self.criar_frame_tela_perfil()
-            self.mostrar_frame("tela_inicio")
+        self.criar_frame_tela_perfil()
+        self.mostrar_frame("tela_inicio")
 
     def trocar_para_tela_perfil(self):
         self.mostrar_frame("tela_perfil")
